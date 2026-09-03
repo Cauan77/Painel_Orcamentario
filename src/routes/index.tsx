@@ -17,7 +17,6 @@ import {
   Calendar,
   Coins,
   Crosshair,
-  Eye,
   FileDown,
   HeartHandshake,
   Landmark,
@@ -808,7 +807,7 @@ function Dashboard() {
     return agrupar(rows, (l) => ({ chave: pautaDe(l), rotulo: pautaDe(l) }));
   }, [rows, visao]);
 
-  const dadosGrafico = useMemo(
+  const dadosGrafico = useMemo<Record<string, string | number>[]>(
     () =>
       agregados.slice(0, 12).map((a) => ({
         nome: a.rotulo.length > 34 ? `${a.rotulo.slice(0, 32)}…` : a.rotulo,
@@ -845,7 +844,7 @@ function Dashboard() {
   }, [recebidasDetalhe, somenteRecebidas, orgaos, pautasAtivas, pas]);
 
   // Gráfico específico para emendas recebidas (top 12 beneficiários)
-  const dadosGraficoRecebidas = useMemo(() => {
+  const dadosGraficoRecebidas = useMemo<Record<string, string | number>[]>(() => {
     const mapa = new Map<string, { Empenhado: number; Liquidado: number; Pago: number }>();
     for (const e of listaEmendasRecebidas) {
       const atual = mapa.get(e.fornecedor) ?? { Empenhado: 0, Liquidado: 0, Pago: 0 };
@@ -1521,9 +1520,6 @@ function Dashboard() {
                 </div>
               )}
             </div>
-
-            {/* Relatório de Projeto / atividade × elemento de despesa (posicionado logo após a seleção de Projetos/Atividades) */}
-            <PainelPaElemento rows={rows} empenhos={empenhos} pas={pas} pautas={pautas} />
 
             {/* 3. Políticas públicas (Pautas temáticas) - COM O MESMO MECANISMO LIMPO */}
             <div className="rounded-lg border border-border/80 bg-muted/20 p-4">
@@ -2422,7 +2418,7 @@ function Dashboard() {
             <div className="h-[360px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={(somenteRecebidas ? dadosGraficoRecebidas : dadosGrafico) as Record<string, string | number>[]}
+                  data={somenteRecebidas ? dadosGraficoRecebidas : dadosGrafico}
                   margin={{ top: 8, right: 16, bottom: 70, left: 8 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />

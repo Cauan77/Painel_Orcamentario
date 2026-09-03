@@ -1,5 +1,13 @@
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import autoTable, { UserOptions } from "jspdf-autotable";
+
+declare module "jspdf" {
+  interface jsPDF {
+    lastAutoTable: {
+      finalY: number;
+    };
+  }
+}
 import {
   agrupar,
   fmtNum,
@@ -214,7 +222,7 @@ export function gerarRelatorioPdf(opts: ReportOptions) {
     theme: "grid",
   });
 
-  let y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 18;
+  let y = doc.lastAutoTable.finalY + 18;
 
   if (opts.grafico) {
     const w = larg - 80;
@@ -265,7 +273,7 @@ export function gerarRelatorioPdf(opts: ReportOptions) {
     willDrawPage: () => undefined,
   });
 
-  y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 18;
+  y = doc.lastAutoTable.finalY + 18;
 
   // Por política pública — descrição dos projetos/atividades (rubricas) antecede a coluna Política
   const porPauta = agrupar(rows, (l) => ({ chave: pautaDe(l), rotulo: pautaDe(l) }));
@@ -653,10 +661,7 @@ export function gerarRelatorioOrgaoPdf(opts: OrgaoReportOptions) {
         fmtNum(total.atualizado),
         fmtNum(total.empenhado),
         fmtNum(
-          (rows as unknown as Array<{ liquidado: number }>).reduce(
-            (s, l) => s + (l.liquidado ?? 0),
-            0,
-          ),
+          rows.reduce((s, l) => s + l.liquidado, 0)
         ),
         fmtNum(total.pago),
         fmtNum(total.saldo),
@@ -669,7 +674,7 @@ export function gerarRelatorioOrgaoPdf(opts: OrgaoReportOptions) {
     margin: { left: 36, right: 36 },
   });
 
-  let y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 22;
+  let y = doc.lastAutoTable.finalY + 22;
 
   // ── 2. Execução por Órgão ────────────────────────────────────────────────
   tituloSecao(doc, "2. Execução Orçamentária por Órgão", y);
@@ -1003,7 +1008,7 @@ export function gerarRelatorioOrgaoPdf(opts: OrgaoReportOptions) {
       ],
     ];
 
-    const columnStylesConfig: Record<number, { halign?: "left" | "center" | "right", cellWidth?: number | "auto" | "wrap" }> = {
+    const columnStylesConfig: UserOptions["columnStyles"] = {
       0: { halign: "center", cellWidth: 36 },
       1: { halign: "center", cellWidth: 30 },
       2: { halign: "left", cellWidth: "auto" },
@@ -1025,7 +1030,7 @@ export function gerarRelatorioOrgaoPdf(opts: OrgaoReportOptions) {
       body,
       foot,
       styles: { fontSize: 6.5, halign: "right", cellPadding: 2.5, overflow: "linebreak" },
-      columnStyles: columnStylesConfig as any,
+      columnStyles: columnStylesConfig,
       headStyles: { fillColor: corHead, halign: "center", fontSize: 6.5, fontStyle: "bold" },
       footStyles: {
         fillColor: corHead,
@@ -1166,7 +1171,7 @@ export function gerarRelatorioOrgaoPdf(opts: OrgaoReportOptions) {
           7: { halign: "right", cellWidth: "wrap" },
           8: { halign: "right", cellWidth: "wrap" },
           9: { halign: "right", cellWidth: "wrap" },
-        } as any,
+        } as UserOptions["columnStyles"],
         headStyles: { fillColor: [22, 163, 74], halign: "center", fontSize: 7, fontStyle: "bold" },
         footStyles: {
           fillColor: [22, 163, 74],
@@ -1185,7 +1190,7 @@ export function gerarRelatorioOrgaoPdf(opts: OrgaoReportOptions) {
     if (empRecebidos.length > 0) {
       let yEmpSec = 128;
       if (linhasEmRecebidas.length > 0) {
-        yEmpSec = (doc as any).lastAutoTable.finalY + 18;
+        yEmpSec = doc.lastAutoTable.finalY + 18;
         if (yEmpSec > doc.internal.pageSize.getHeight() - 60) {
           doc.addPage();
           yEmpSec = 40;
@@ -1247,7 +1252,7 @@ export function gerarRelatorioOrgaoPdf(opts: OrgaoReportOptions) {
           5: { halign: "right", cellWidth: 64 },
           6: { halign: "right", cellWidth: 64 },
           7: { halign: "right", cellWidth: 64 },
-        } as any,
+        } as UserOptions["columnStyles"],
         headStyles: {
           fillColor: [22, 163, 74],
           halign: "center",

@@ -2,7 +2,7 @@ import base from "@/data/execucao-2026.json";
 
 export type Linha = {
   ano?: number;
-  mes?: number | string;
+  mes?: number;
   orgao: string;
   orgaoNome: string;
   programa: string;
@@ -212,7 +212,7 @@ export const fmtMoeda = (v: number) => brl.format(v || 0);
 export const fmtNum = (v: number) => brlFull.format(v || 0);
 export const fmtPct = (v: number) => `${(v || 0).toFixed(1).replace(".", ",")}%`;
 
-export const ORGAOS = ["SMDHC", "FAASP", "FUMCAD", "FMID"] as const;
+export const ORGAOS = ["SMDHC", "FAASP", "FUMCAD", "FMID", "FUMCAF"] as const;
 
 export const ANOS_EXERCICIO = [2026, 2025, 2024, 2023, 2022, 2021, 2020] as const;
 
